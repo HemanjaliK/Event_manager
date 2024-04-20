@@ -55,7 +55,7 @@ class UserBase(BaseModel):
         example="john_doe_123"
     )
     email: EmailStr = Field(
-        ...,
+     ...,
         description="The email address of the user.",
         example="john.doe@example.com"
     )
@@ -86,9 +86,9 @@ class UserBase(BaseModel):
 
     @validator('full_name')
     def validate_full_name(cls, v):
-        if v and not re.match(r"^[a-zA-Z\s'-]+$", v):
+      if v and not re.match(r"^[a-zA-Z\s'-]+$", v):
             raise ValueError("Full name can only contain letters, spaces, hyphens, or apostrophes.")
-        return v
+      return v
 
     @validator('profile_picture_url', pre=True, always=True)
     def validate_profile_picture_url(cls, v):
@@ -142,8 +142,8 @@ class UserCreate(UserBase):
                 "email": "john.doe@example.com",
                 "password": "SecurePassword123!",
                 "full_name": "John Doe",
-                "bio": "I am a data scientist passionate about machine learning and big data analytics.",
-                "profile_picture_url": "https://example.com/profile_pictures/jane_smith.jpg"
+                "bio": "I am a software engineer with over 5 years of experience in building scalable web applications using Python and JavaScript.",
+                "profile_picture_url": "https://example.com/profile_pictures/john_doe.jpg"
             }
         }
 
@@ -166,7 +166,7 @@ class UserUpdate(BaseModel):
         description="An updated biography or description of the user.",
         example="I am a senior software engineer specializing in backend development with Python and Node.js."
     )
-    profile_picture_url: Optional[HttpUrl] = Field(
+    profile_picture_url: Optional[str] = Field(
         None,
         description="An updated URL to the user's profile picture.",
         example="https://example.com/profile_pictures/john_doe_updated.jpg"
@@ -233,7 +233,7 @@ class UserResponse(UserBase):
         if isinstance(value, uuid.UUID):
             return str(value)
         return value
-    class Config:
+class Config:
         json_schema_extra = {
             "description": "Model for user response data.",
             "example": {
@@ -247,8 +247,8 @@ class UserResponse(UserBase):
                 "created_at": "2023-04-01T10:15:30+00:00",
                 "updated_at": "2023-04-05T16:45:00+00:00",
                 "links": [
-                    {"rel": "self", "href": "https://api.example.com/users/a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6"},
-                    {"rel": "update", "href": "https://api.example.com/users/a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6"}
+                         {"rel": "self", "href": "https://api.example.com/users/a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6"},
+                         {"rel": "update", "href": "https://api.example.com/users/a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6"}
                 ]
             }
         }
@@ -264,7 +264,7 @@ class UserListResponse(BaseModel):
         description="Pagination details including the current page, total pages, total items, and navigational links."
     )
 
-    class Config:
+class Config:
         json_schema_extra = {
             "description": "Model for a paginated list of user responses.",
             "example": {
@@ -356,5 +356,5 @@ class ErrorResponse(BaseModel):
             "example": {
                 "error": "Invalid username or password.",
                 "details": "The provided username does not exist or the password is incorrect."
-            }
-        }
+       }
+}
