@@ -8,6 +8,7 @@
 6. Then we need to run the "docker compose exec fastapi pytest tests/test_api/test_users_api.py::test_delete_user_does_not_exist"
 7. And also "docker compose exec fastapi alembic upgrade head"
 8. After running this two commands then we need to refresh the local/docs then we can find the out as same username and password in the both register and login
+# https://github.com/HemanjaliK/event_manager/commit/90dfdf03c744bd834329e9dc1e25c3e99d9bc90b
 
 
 **ISSUE**: 2
