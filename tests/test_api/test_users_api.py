@@ -8,50 +8,49 @@ from app.utils.security import hash_password
 # Example of a test function using the async_client fixture
 @pytest.mark.asyncio
 async def test_create_user(async_client):
-    form_data = {
-        "username": "admin",
-        "password": "secret",
-    }
+    # Authenticate and get a token
+    form_data = {"username": "admin", "password": "secret"}
     token_response = await async_client.post("/token", data=form_data)
-    assert token_response.status_code == 200
+    assert token_response.status_code == 200, "Authentication failed"
     access_token = token_response.json().get("access_token")
-    assert access_token is not None
+    assert access_token, "No access token provided"
     headers = {"Authorization": f"Bearer {access_token}"}
 
+    # Data for creating a new user
     user_data = {
         "username": "testuser",
         "email": "test@example.com",
-        "password": "sS#fdasrongPassword123!",
+        "password": "sS#fdasrongPassword123!"
     }
     response = await async_client.post("/users/", json=user_data, headers=headers)
-    assert response.status_code == 201, f"Failed to create user: {response.json()}"
+    assert response.status_code == 201, f"Failed to create user: {response.text}"
 
 @pytest.mark.asyncio
 async def test_create_user2(async_client):
-    form_data = {
-        "username": "admin",
-        "password": "secret",
-    }
+    # Repeating the login process for a fresh token
+    form_data = {"username": "admin", "password": "secret"}
     token_response = await async_client.post("/token", data=form_data)
     assert token_response.status_code == 200
     access_token = token_response.json().get("access_token")
     headers = {"Authorization": f"Bearer {access_token}"}
 
+    # Attempt to create two users where the second should fail
     user_data1 = {
         "username": "testuser",
         "email": "test@example.com",
-        "password": "sS#fdasrongPassword123!",
+        "password": "sS#fdasrongPassword123!"
     }
-    response = await async_client.post("/users/", json=user_data1, headers=headers)
-    assert response.status_code == 201, "User should be created successfully"
+    response1 = await async_client.post("/users/", json=user_data1, headers=headers)
+    assert response1.status_code == 201, "First user should be created successfully"
 
     user_data2 = {
-        "username": "testuser",
-        "email": "different@example.com",
-        "password": "sS#fdasrongPassword123!",
+        "username": "testuser3",
+        "email": "test@example.com",
+        "password": "sS#fdasrongPassword123!"
     }
     response2 = await async_client.post("/users/", json=user_data2, headers=headers)
-    assert response2.status_code == 400, "Should fail due to duplicate username"
+    assert response2.status_code == 400, "Expected failure on creating second user with duplicate details"
+
 
 @pytest.mark.asyncio
 async def test_retrieve_user(async_client, user, token):
