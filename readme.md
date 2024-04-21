@@ -27,7 +27,7 @@
 6. Then we need to run the "docker compose exec fastapi pytest tests/test_api/test_users_api.py::test_delete_user_does_not_exist"
 7. And also "docker compose exec fastapi alembic upgrade head"
 8. After running this two commands then we need to refresh the local/docs then we can see there is no Null values
-
+# https://github.com/HemanjaliK/event_manager/commit/4620cb4eef51e911f2b0f21078f6a7f35eaf9b98
 
 **ISSUE**: 3
 **URL**:
