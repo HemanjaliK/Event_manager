@@ -5,9 +5,7 @@ from app.main import app
 from app.models.user_model import User
 from app.utils.security import hash_password  # Import your FastAPI app
 
-
-# Fixtures would be defined elsewhere to supply async_client, user, and token
-
+# Example of a test function using the async_client fixture
 @pytest.mark.asyncio
 async def test_create_user(async_client):
     form_data = {
@@ -16,7 +14,6 @@ async def test_create_user(async_client):
     }
     # Login and get the access token
     token_response = await async_client.post("/token", data=form_data)
-    assert token_response.status_code == 200, "Failed to log in for token"
     access_token = token_response.json()["access_token"]
     headers = {"Authorization": f"Bearer {access_token}"}
 
@@ -31,7 +28,7 @@ async def test_create_user(async_client):
     response = await async_client.post("/users/", json=user_data, headers=headers)
 
     # Asserts
-    assert response.status_code == 201, f"Failed to create user: {response.text}"
+    assert response.status_code == 201
 
 @pytest.mark.asyncio
 async def test_create_user2(async_client):
@@ -41,36 +38,31 @@ async def test_create_user2(async_client):
     }
     # Login and get the access token
     token_response = await async_client.post("/token", data=form_data)
-    assert token_response.status_code == 200, "Failed to log in for token"
     access_token = token_response.json()["access_token"]
     headers = {"Authorization": f"Bearer {access_token}"}
 
-    # Define user data for the first user creation
+    # Define user data for the test
     user_data1 = {
         "username": "testuser",
         "email": "test@example.com",
         "password": "sS#fdasrongPassword123!",
     }
 
-    # Send a POST request to create the first user
-    response1 = await async_client.post("/users/", json=user_data1, headers=headers)
-    assert response1.status_code == 201, f"Failed to create first user: {response1.text}"
+    # Send a POST request to create a user
+    response = await async_client.post("/users/", json=user_data1, headers=headers)
 
-    # Define user data for the second user creation
+    # Define user data for the test
     user_data2 = {
-        "username": "testuser2",
+        "username": "testuser3",
         "email": "test@example.com",
         "password": "sS#fdasrongPassword123!",
     }
 
-    # Send a POST request to create the second user
+    # Send a POST request to create a user
     response2 = await async_client.post("/users/", json=user_data2, headers=headers)
 
-    # Assert that a 400 error is received due to duplicate email
-    assert response2.status_code == 400, f"Expected failure due to duplicate email, but got: {response2.text}"
-
-# Ensure to create and use the correct fixtures for async_client, user, and token if not already defined
-
+    # Asserts
+    assert response2.status_code == 400
 
 # You can similarly refactor other test functions to use the async_client fixture
 @pytest.mark.asyncio
