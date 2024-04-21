@@ -4,7 +4,7 @@ from app.database import get_async_db
 from app.main import app
 from app.models.user_model import User
 from app.utils.security import hash_password  # Import your FastAPI app
-# Example of a test function using the async_client fixture
+# Example of a test function using the async_client fixtur
 @pytest.mark.asyncio
 async def test_create_user(async_client):
     # Setup: Ensure admin user exists in the database for authentication
