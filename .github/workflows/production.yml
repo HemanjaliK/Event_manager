@@ -53,7 +53,7 @@ jobs:
   build-and-push-docker:
     needs: test
     runs-on: ubuntu-latest
-    environment: production
+    environment: env
     steps:
       - uses: actions/checkout@v4
       
@@ -70,8 +70,16 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: hemanjalik/wis_club_api:${{ github.sha }} # Uses the Git SHA for tagging
+          tags: hemanjalik/event:${{ github.sha }} # Uses the Git SHA for tagging
           platforms: linux/amd64,linux/arm64 # Multi-platform support
-          cache-from: type=registry,ref=hemanjalik/wis_club_api:cache
+          cache-from: type=registry,ref=hemanjalik/event:cache
           cache-to: type=inline,mode=max
           
+      - name: Scan the Docker image
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'hemanjalik/event:${{ github.sha }}'
+          format: 'table'
+          exit-code: '1' # Fail the job if vulnerabilities are found
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH'
