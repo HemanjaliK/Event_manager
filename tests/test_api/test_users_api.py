@@ -40,6 +40,47 @@ async def test_create_user_duplicate_username(async_client, auth_token, user):
     assert "Username already exists" in response.json().get("detail", "")
 
 @pytest.mark.asyncio
+async def test_retrieve_user(async_client, user, token):
+    headers = {"Authorization": f"Bearer {token}"}
+    response = await async_client.get(f"/users/{user.id}", headers=headers)
+    assert response.status_code == 200
+    assert response.json()["id"] == str(user.id)
+
+@pytest.mark.asyncio
+async def test_retrieve_user2(async_client, user, token):
+    headers = {"Authorization": f"Bearer {token}"}
+    response = await async_client.get(f"/users/{user.id}", headers=headers)
+    assert response.status_code == 200
+    assert response.json()["username"] == str(user.username)
+
+@pytest.mark.asyncio
+async def test_update_user(async_client, user, token):
+    updated_data = {"email": f"updated_{user.id}@example.com"}
+    headers = {"Authorization": f"Bearer {token}"}
+    response = await async_client.put(f"/users/{user.id}", json=updated_data, headers=headers)
+    assert response.status_code == 200
+    assert response.json()["email"] == updated_data["email"]
+
+@pytest.mark.asyncio
+async def test_update_user2(async_client, user, token):
+    updated_data = {"email": f"updated_{user.id}@example.com","bio": "I am a senior ."}
+    headers = {"Authorization": f"Bearer {token}"}
+    response = await async_client.put(f"/users/{user.id}", json=updated_data, headers=headers)
+    assert response.status_code == 200
+    assert response.json()["email"] == updated_data["email"]
+    assert response.json()["bio"] == updated_data["bio"]
+
+@pytest.mark.asyncio
+async def test_delete_user(async_client, user, token):
+    headers = {"Authorization": f"Bearer {token}"}
+    delete_response = await async_client.delete(f"/users/{user.id}", headers=headers)
+    assert delete_response.status_code == 204
+    # Verify the user is deleted
+    fetch_response = await async_client.get(f"/users/{user.id}", headers=headers)
+    assert fetch_response.status_code == 404
+
+
+@pytest.mark.asyncio
 async def test_login_success(async_client, user):
     response = await async_client.post("/login/", json={"username": user.username, "password": "MySuperPassword$1234"})
     assert response.status_code == 200
