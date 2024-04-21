@@ -5,13 +5,6 @@ from app.main import app
 from app.models.user_model import User
 from app.utils.security import hash_password
 
-import pytest
-from httpx import AsyncClient
-from app.database import get_async_db
-from app.main import app
-from app.models.user_model import User
-from app.utils.security import hash_password  # Import your FastAPI app
-
 # Example of a test function using the async_client fixture
 @pytest.mark.asyncio
 async def test_create_user(async_client):
