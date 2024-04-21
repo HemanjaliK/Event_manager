@@ -6,17 +6,23 @@ from app.models.user_model import User
 from app.utils.security import hash_password
 
 # Example of a test function using the async_client fixture
+@pytest.fixture
+async def async_client():
+    async with AsyncClient(app=app, base_url="http://test") as client:
+        yield client
+
+# Helper function to authenticate and retrieve access token
+async def authenticate_user(async_client, username, password):
+    form_data = {"username": username, "password": password}
+    response = await async_client.post("/token", data=form_data)
+    assert response.status_code == 200, f"Authentication failed: {response.text}"
+    return response.json().get("access_token")
+
+# Tests
 @pytest.mark.asyncio
 async def test_create_user(async_client):
-    # Authenticate and get a token
-    form_data = {"username": "admin", "password": "secret"}
-    token_response = await async_client.post("/token", data=form_data)
-    assert token_response.status_code == 200, "Authentication failed"
-    access_token = token_response.json().get("access_token")
-    assert access_token, "No access token provided"
+    access_token = await authenticate_user(async_client, "admin", "secret")
     headers = {"Authorization": f"Bearer {access_token}"}
-
-    # Data for creating a new user
     user_data = {
         "username": "testuser",
         "email": "test@example.com",
@@ -26,12 +32,8 @@ async def test_create_user(async_client):
     assert response.status_code == 201, f"Failed to create user: {response.text}"
 
 @pytest.mark.asyncio
-async def test_create_user2(async_client):
-    # Repeating the login process for a fresh token
-    form_data = {"username": "admin", "password": "secret"}
-    token_response = await async_client.post("/token", data=form_data)
-    assert token_response.status_code == 200
-    access_token = token_response.json().get("access_token")
+async def test_create_user(async_client):
+    access_token = await authenticate_user(async_client, "admin", "secret")
     headers = {"Authorization": f"Bearer {access_token}"}
 
     # Attempt to create two users where the second should fail
@@ -51,16 +53,22 @@ async def test_create_user2(async_client):
     response2 = await async_client.post("/users/", json=user_data2, headers=headers)
     assert response2.status_code == 400, "Expected failure on creating second user with duplicate details"
 
-
 @pytest.mark.asyncio
-async def test_retrieve_user(async_client, user, token):
+async def test_retrieve_user(async_client):
+    # Assume 'user' and 'token' are fixtures or retrieved via some setup
+    user = User(username="testuser", email="test@example.com")
+    token = await authenticate_user(async_client, user.username, "sS#fdasrongPassword123!")
+
     headers = {"Authorization": f"Bearer {token}"}
     response = await async_client.get(f"/users/{user.id}", headers=headers)
     assert response.status_code == 200
     assert response.json().get("id") == str(user.id)
 
 @pytest.mark.asyncio
-async def test_update_user(async_client, user, token):
+async def test_update_user(async_client):
+    user = User(username="testuser", email="test@example.com")  # Mocked user
+    token = await authenticate_user(async_client, user.username, "sS#fdasrongPassword123!")
+
     updated_data = {"email": f"updated_{user.id}@example.com"}
     headers = {"Authorization": f"Bearer {token}"}
     response = await async_client.put(f"/users/{user.id}", json=updated_data, headers=headers)
@@ -68,13 +76,15 @@ async def test_update_user(async_client, user, token):
     assert response.json().get("email") == updated_data["email"]
 
 @pytest.mark.asyncio
-async def test_delete_user(async_client, user, token):
+async def test_delete_user(async_client):
+    user = User(username="testuser", email="test@example.com")  # Mocked user
+    token = await authenticate_user(async_client, user.username, "sS#fdasrongPassword123!")
+
     headers = {"Authorization": f"Bearer {token}"}
     delete_response = await async_client.delete(f"/users/{user.id}", headers=headers)
     assert delete_response.status_code == 204
     fetch_response = await async_client.get(f"/users/{user.id}", headers=headers)
     assert fetch_response.status_code == 404
-
 
 @pytest.mark.asyncio
 async def test_login_success(async_client, user):
