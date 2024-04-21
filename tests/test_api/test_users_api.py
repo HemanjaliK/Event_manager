@@ -11,20 +11,26 @@ async def test_create_user(async_client):
         "username": "admin",
         "password": "secret",
     }
-    # Login and get the access token
+    # Attempt to login and retrieve the access token
     token_response = await async_client.post("/token", data=form_data)
-    access_token = token_response.json()["access_token"]
+    assert token_response.status_code == 200, "Authentication failed: Could not retrieve token."
+    access_token = token_response.json().get("access_token")
+    assert access_token, "No access token returned."
+
     headers = {"Authorization": f"Bearer {access_token}"}
-    # Define user data for the test
     user_data = {
         "username": "testuser",
         "email": "test@example.com",
         "password": "sS#fdasrongPassword123!",
     }
-    # Send a POST request to create a user
+    # Attempt to create a user
     response = await async_client.post("/users/", json=user_data, headers=headers)
-    # Asserts
-    assert response.status_code == 201
+    if response.status_code != 201:
+        print(f"Failed to create user: {response.json()}")  # Print detailed error message for debugging
+    assert response.status_code == 201, f"Failed to create user, response: {response.text}"
+
+    # Additional checks for the response content can be added here if necessary
+
 # You can similarly refactor other test functions to use the async_client fixture
 @pytest.mark.asyncio
 async def test_retrieve_user(async_client, user, token):
