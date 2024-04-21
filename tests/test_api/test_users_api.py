@@ -7,33 +7,30 @@ from app.utils.security import hash_password  # Import your FastAPI app
 # Example of a test function using the async_client fixtur
 @pytest.mark.asyncio
 async def test_create_user(async_client):
-    # Setup: Ensure admin user exists in the database for authentication
-    admin_data = {
-        "username": "admin",
-        "password": hash_password("secret"),  # Assuming hash_password is the function used by your auth system
-        # Add other necessary fields as required by your schema
-    }
-    # Create admin user directly in the database or through an API call if setup endpoint is available
     form_data = {
         "username": "admin",
         "password": "secret",
     }
-    # Login and get the access token
+    # Attempt to login and retrieve the access token
     token_response = await async_client.post("/token", data=form_data)
-    assert token_response.status_code == 200, "Failed to authenticate admin user"
-    access_token = token_response.json()["access_token"]
+    assert token_response.status_code == 200, "Authentication failed: Could not retrieve token."
+    access_token = token_response.json().get("access_token")
+    assert access_token, "No access token returned."
+
     headers = {"Authorization": f"Bearer {access_token}"}
-    # Define user data for the test
     user_data = {
         "username": "testuser",
         "email": "test@example.com",
         "password": "sS#fdasrongPassword123!",
     }
-    # Send a POST request to create a user
+    # Attempt to create a user
     response = await async_client.post("/users/", json=user_data, headers=headers)
-    # Asserts
+    if response.status_code != 201:
+        print(f"Failed to create user: {response.json()}")  # Print detailed error message for debugging
     assert response.status_code == 201, f"Failed to create user, response: {response.text}"
-# You can similarly refactor other test functions to use the async_client fixture
+
+    # Additional checks for the response content can be added here if necessary
+
 @pytest.mark.asyncio
 async def test_retrieve_user(async_client, user, token):
     headers = {"Authorization": f"Bearer {token}"}
