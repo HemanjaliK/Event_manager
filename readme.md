@@ -37,6 +37,13 @@
 4. In github Repository we have to create the issue and then created the branch
 5. We have to change the http url to string in the app/schemas/user_schemas.py so that the issue get updated in the localhost/doc
 6. After changing the code we need to refresh the localhost/doc so that it gets updated in PUT.
+# https://github.com/HemanjaliK/event_manager/commit/522d6a876d1bf9f7713ab1c13fbc21d986875790
 
+**ISSUE**: 4
+# https://github.com/HemanjaliK/event_manager/commit/5ebba5233218fa8fdcbb6a9364e67397ef2d5948
+
+**ISSUE**: 5
+# https://github.com/HemanjaliK/event_manager/commit/c07465ee3f8d58d8f6fd35c9ec568806000f7ebc
 
 **WHAT I HAVE LEARNED FROM THIS ASSIGNMENT IS**:
+ I have learn about building and managing a full-stack application using technologies such as FastAPI for backend development, which offers features for easy API creation with automatic interactive documentation, user management, and secure handling of user data. The use of a database management tool like pgAdmin (accessible via http://localhost:5050/browser/) would enhance skills in database operations and management. Additionally, you'd gain experience in implementing user authentication and authorization, designing RESTful APIs, and understanding how to document and test APIs effectively using tools integrated into development environments like Swagger UI at http://localhost/docs#/User%20Management/. This project would also likely improve your ability to work with version control systems like Git and deploy applications using Docker, thereby enhancing both your development and operational skills.
