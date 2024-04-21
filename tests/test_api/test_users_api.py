@@ -5,7 +5,12 @@ from app.main import app
 from app.models.user_model import User
 from app.utils.security import hash_password  # Import your FastAPI app
 
-# Example of a test function using the async_client fixture
+@pytest.fixture
+async def auth_token(async_client):
+    user_credentials = {"username": "admin", "password": "secret"}
+    response = await async_client.post("/token", data=user_credentials)
+    return response.json()["access_token"]
+    
 @pytest.mark.asyncio
 async def test_create_user(async_client):
     form_data = {
